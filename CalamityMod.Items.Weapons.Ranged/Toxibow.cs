@@ -1,0 +1,57 @@
+using CalamityMod.Items.Materials;
+using CalamityMod.Items.Placeables.FurnitureAcidwood;
+using CalamityMod.Projectiles.Ranged;
+using Microsoft.Xna.Framework;
+using Terraria;
+using Terraria.DataStructures;
+using Terraria.ID;
+using Terraria.ModLoader;
+
+namespace CalamityMod.Items.Weapons.Ranged;
+
+public class Toxibow : ModItem, ILocalizedModType, IModType
+{
+	public new string LocalizationCategory => "Items.Weapons.Ranged";
+
+	public override void SetDefaults()
+	{
+		base.Item.width = 22;
+		base.Item.height = 60;
+		base.Item.damage = 15;
+		base.Item.DamageType = DamageClass.Ranged;
+		base.Item.useAnimation = (base.Item.useTime = 28);
+		base.Item.useStyle = 5;
+		base.Item.noMelee = true;
+		base.Item.knockBack = 3f;
+		base.Item.value = CalamityGlobalItem.RarityGreenBuyPrice;
+		base.Item.rare = 2;
+		base.Item.UseSound = SoundID.Item5;
+		base.Item.autoReuse = true;
+		base.Item.shoot = 10;
+		base.Item.shootSpeed = 15f;
+		base.Item.useAmmo = AmmoID.Arrow;
+	}
+
+	public override bool Shoot(Player player, EntitySource_ItemUse_WithAmmo source, Vector2 position, Vector2 velocity, int type, int damage, float knockback)
+	{
+		//IL_0038: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0039: Unknown result type (might be due to invalid IL or missing references)
+		//IL_000b: Unknown result type (might be due to invalid IL or missing references)
+		//IL_000c: Unknown result type (might be due to invalid IL or missing references)
+		if (CalamityUtils.CheckWoodenAmmo(type, player))
+		{
+			Projectile.NewProjectile(source, position, velocity, ModContent.ProjectileType<ToxicArrow>(), damage, 0f, player.whoAmI);
+		}
+		else
+		{
+			Projectile.NewProjectile(source, position, velocity, type, damage, knockback, player.whoAmI);
+		}
+		return false;
+	}
+
+	public override void AddRecipes()
+	{
+		CreateRecipe().AddIngredient<Acidwood>(15).AddIngredient<SulphuricScale>(12).AddTile(16)
+			.Register();
+	}
+}

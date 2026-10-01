@@ -1,0 +1,80 @@
+using CalamityMod.Items.Placeables.DraedonStructures.CagedLights;
+using CalamityMod.Sounds;
+using Microsoft.Xna.Framework;
+using Terraria;
+using Terraria.DataStructures;
+using Terraria.Enums;
+using Terraria.ID;
+using Terraria.ModLoader;
+using Terraria.ObjectData;
+
+namespace CalamityMod.Tiles.DraedonStructures.CagedLights;
+
+public class CagedLablight : ModTile
+{
+	public override void SetStaticDefaults()
+	{
+		//IL_0077: Unknown result type (might be due to invalid IL or missing references)
+		Main.tileLighted[base.Type] = true;
+		Main.tileNoFail[base.Type] = true;
+		Main.tileFrameImportant[base.Type] = true;
+		Main.tileObsidianKill[base.Type] = false;
+		RegisterItemDrop(ModContent.ItemType<CagedLablightItem>());
+		base.HitSound = CommonCalamitySounds.PlatingMine;
+		base.DustType = 299;
+		AddToArray(ref TileID.Sets.RoomNeeds.CountsAsTorch);
+		AddMapEntry(new Color(48, 201, 214), CalamityUtils.GetItemName<CagedLablightItem>());
+		TileObjectData.newTile.CopyFrom(TileObjectData.Style2x2);
+		TileObjectData.newTile.StyleHorizontal = true;
+		TileObjectData.newTile.StyleMultiplier = 10;
+		TileObjectData.newTile.StyleWrapLimit = 2;
+		TileObjectData.newTile.Origin = new Point16(0, 1);
+		TileObjectData.newAlternate.CopyFrom(TileObjectData.newTile);
+		TileObjectData.newAlternate.AnchorRight = new AnchorData(AnchorType.SolidTile | AnchorType.SolidSide, TileObjectData.newTile.Width, 0);
+		TileObjectData.newAlternate.AnchorBottom = AnchorData.Empty;
+		TileObjectData.newAlternate.Origin = new Point16(1, 0);
+		TileObjectData.addAlternate(2);
+		TileObjectData.newAlternate.CopyFrom(TileObjectData.newTile);
+		TileObjectData.newAlternate.AnchorTop = new AnchorData(AnchorType.SolidTile | AnchorType.SolidBottom, TileObjectData.newTile.Width, 0);
+		TileObjectData.newAlternate.AnchorBottom = AnchorData.Empty;
+		TileObjectData.newAlternate.Origin = new Point16(0, 0);
+		TileObjectData.addAlternate(4);
+		TileObjectData.newAlternate.CopyFrom(TileObjectData.newTile);
+		TileObjectData.newAlternate.AnchorLeft = new AnchorData(AnchorType.SolidTile | AnchorType.SolidSide, TileObjectData.newTile.Width, 0);
+		TileObjectData.newAlternate.AnchorBottom = AnchorData.Empty;
+		TileObjectData.newAlternate.Origin = new Point16(0, 0);
+		TileObjectData.addAlternate(6);
+		TileObjectData.newAlternate.CopyFrom(TileObjectData.newTile);
+		TileObjectData.newAlternate.AnchorWall = true;
+		TileObjectData.newAlternate.AnchorBottom = AnchorData.Empty;
+		TileObjectData.newAlternate.Origin = new Point16(1, 0);
+		TileObjectData.addAlternate(8);
+		TileObjectData.addTile(base.Type);
+	}
+
+	public override void NumDust(int i, int j, bool fail, ref int num)
+	{
+		num = (fail ? 1 : 3);
+	}
+
+	public override void HitWire(int i, int j)
+	{
+		FurnitureCommon.LightHitWire(base.Type, i, j, 2, 2);
+	}
+
+	public override void ModifyLight(int i, int j, ref float r, ref float g, ref float b)
+	{
+		if (Main.tile[i, j].TileFrameX < 18)
+		{
+			r = 0.12156863f;
+			g = 0.9843137f;
+			b = 1f;
+		}
+		else
+		{
+			r = 0f;
+			g = 0f;
+			b = 0f;
+		}
+	}
+}

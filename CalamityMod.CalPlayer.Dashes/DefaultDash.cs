@@ -1,0 +1,30 @@
+using CalamityMod.Enums;
+using Terraria;
+using Terraria.DataStructures;
+
+namespace CalamityMod.CalPlayer.Dashes;
+
+public class DefaultDash : PlayerDashEffect
+{
+	public new static string ID { get; private set; }
+
+	public override DashCollisionType CollisionType => DashCollisionType.NoCollision;
+
+	public override bool IsOmnidirectional => false;
+
+	public override void Load()
+	{
+		ID = DashID;
+	}
+
+	public override float CalculateDashSpeed(Player player)
+	{
+		return 1f;
+	}
+
+	public override void OnHitEffects(Player player, NPC npc, IEntitySource source, ref DashHitContext hitContext)
+	{
+		hitContext.BaseDamage = 0;
+		hitContext.PlayerImmunityFrames = 0;
+	}
+}

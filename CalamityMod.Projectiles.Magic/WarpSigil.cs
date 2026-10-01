@@ -1,0 +1,134 @@
+using System;
+using CalamityMod.Particles;
+using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
+using ReLogic.Content;
+using Terraria;
+using Terraria.GameContent;
+using Terraria.ModLoader;
+
+namespace CalamityMod.Projectiles.Magic;
+
+public class WarpSigil : ModProjectile, ILocalizedModType, IModType
+{
+	private bool spawnedProjectile;
+
+	private bool spawnedIntroParticle;
+
+	public new string LocalizationCategory => "Projectiles.Magic";
+
+	public override void SetDefaults()
+	{
+		base.Projectile.width = (base.Projectile.height = 74);
+		base.Projectile.friendly = false;
+		base.Projectile.DamageType = DamageClass.Magic;
+		base.Projectile.penetrate = -1;
+		base.Projectile.tileCollide = false;
+	}
+
+	public override void AI()
+	{
+		//IL_00a0: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00a5: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00c4: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00ca: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00cc: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00d2: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00e3: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00e9: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00eb: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00f0: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00f5: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00fd: Unknown result type (might be due to invalid IL or missing references)
+		//IL_015d: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0162: Unknown result type (might be due to invalid IL or missing references)
+		//IL_022d: Unknown result type (might be due to invalid IL or missing references)
+		//IL_024b: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0259: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0291: Unknown result type (might be due to invalid IL or missing references)
+		//IL_028a: Unknown result type (might be due to invalid IL or missing references)
+		Projectile parent = Main.projectile[(int)base.Projectile.ai[0]];
+		bool parentActive = parent != null && parent.active && parent.type == ModContent.ProjectileType<SigilSet>();
+		if (!parentActive && base.Projectile.ai[2] == 0f)
+		{
+			base.Projectile.Kill();
+			return;
+		}
+		int i = (int)base.Projectile.ai[1];
+		float dist = ((i % 3 == 0) ? 270f : 280f);
+		float extraRot = ((i % 3 == 0) ? 0f : ((i % 3 == 1) ? MathHelper.ToRadians(-3.33f) : MathHelper.ToRadians(3.33f)));
+		Vector2 sigilPos = parent.Center + (Vector2.UnitX.RotatedBy(MathHelper.Lerp(0f, (float)Math.PI * 2f, (float)i / 6f)) * dist).RotatedBy(parent.rotation + extraRot);
+		base.Projectile.Center = sigilPos;
+		if (base.Projectile.ai[2] > 0f)
+		{
+			base.Projectile.localAI[0]++;
+			if (base.Projectile.localAI[0] >= 25f && !spawnedProjectile)
+			{
+				Projectile.NewProjectile(base.Projectile.GetSource_FromThis(), Main.MouseWorld, Vector2.Zero, ModContent.ProjectileType<WarpSigilShotCreator>(), base.Projectile.damage, base.Projectile.knockBack, base.Projectile.owner, 0f, base.Projectile.whoAmI, base.Projectile.timeLeft);
+				spawnedProjectile = true;
+			}
+			if (base.Projectile.localAI[0] >= 70f)
+			{
+				base.Projectile.Kill();
+			}
+		}
+		else
+		{
+			base.Projectile.rotation = 0f;
+			base.Projectile.alpha = parent.alpha;
+		}
+		if (parentActive)
+		{
+			base.Projectile.timeLeft = parent.timeLeft;
+		}
+		if (!spawnedIntroParticle)
+		{
+			for (int j = 0; j < 13; j++)
+			{
+				spawnedIntroParticle = true;
+				GeneralParticleHandler.SpawnParticle(new SquishyLightParticle(base.Projectile.Center, Utils.RotatedByRandom(new Vector2(Main.rand.NextFloat(3f, 7f), 0f), 6.2831854820251465), base.Projectile.scale * Main.rand.NextFloat(0.2f, 0.475f), Main.rand.NextBool() ? Color.Magenta : Color.White, Main.rand.Next(12, 24), 1f, 0f, 1f));
+			}
+		}
+	}
+
+	public override bool PreDraw(ref Color lightColor)
+	{
+		//IL_00e2: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00e7: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00ec: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0102: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0107: Unknown result type (might be due to invalid IL or missing references)
+		//IL_010d: Unknown result type (might be due to invalid IL or missing references)
+		//IL_011e: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0128: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0154: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0159: Unknown result type (might be due to invalid IL or missing references)
+		//IL_015e: Unknown result type (might be due to invalid IL or missing references)
+		//IL_016d: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0174: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0185: Unknown result type (might be due to invalid IL or missing references)
+		//IL_018f: Unknown result type (might be due to invalid IL or missing references)
+		Texture2D mainTexture = TextureAssets.Projectile[base.Type].Value;
+		Texture2D blankTexture = ModContent.Request<Texture2D>("CalamityMod/Projectiles/Magic/BlankSigil", (AssetRequestMode)2).Value;
+		float finalScale = base.Projectile.scale;
+		float alphaOpacity = 1f - (float)base.Projectile.alpha / 255f;
+		float maskOpacity = 0f;
+		if (base.Projectile.ai[2] > 0f)
+		{
+			float animationTime = base.Projectile.localAI[0];
+			maskOpacity = ((!(animationTime <= 18f)) ? 1f : Utils.GetLerpValue(0f, 18f, animationTime, clamped: true));
+			if (animationTime >= 55f)
+			{
+				float scaleFactor = Utils.GetLerpValue(55f, 70f, animationTime, clamped: true);
+				finalScale = MathHelper.Lerp(base.Projectile.scale, 0f, scaleFactor);
+				alphaOpacity = MathHelper.Lerp(alphaOpacity, 0f, scaleFactor);
+			}
+		}
+		Main.EntitySpriteDraw(mainTexture, base.Projectile.Center - Main.screenPosition, null, base.Projectile.GetAlpha(lightColor) * alphaOpacity, base.Projectile.rotation, mainTexture.Size() / 2f, finalScale, (SpriteEffects)0);
+		if (base.Projectile.ai[2] > 0f)
+		{
+			Main.EntitySpriteDraw(blankTexture, base.Projectile.Center - Main.screenPosition, null, Color.White * maskOpacity, base.Projectile.rotation, blankTexture.Size() / 2f, finalScale, (SpriteEffects)0);
+		}
+		return false;
+	}
+}

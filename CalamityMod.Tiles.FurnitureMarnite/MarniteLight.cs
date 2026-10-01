@@ -1,0 +1,87 @@
+using CalamityMod.Items.Placeables.FurnitureMarnite;
+using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
+using ReLogic.Content;
+using Terraria;
+using Terraria.DataStructures;
+using Terraria.ModLoader;
+
+namespace CalamityMod.Tiles.FurnitureMarnite;
+
+public class MarniteLight : ModTile
+{
+	public Asset<Texture2D> FlameTexture;
+
+	public override void SetStaticDefaults()
+	{
+		this.SetUpTorch(ModContent.ItemType<global::CalamityMod.Items.Placeables.FurnitureMarnite.MarniteLight>(), waterImmune: true, lavaImmune: true);
+	}
+
+	public override bool CreateDust(int i, int j, ref int type)
+	{
+		//IL_0004: Unknown result type (might be due to invalid IL or missing references)
+		//IL_000e: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0036: Unknown result type (might be due to invalid IL or missing references)
+		Dust.NewDust(new Vector2((float)i, (float)j) * 16f, 16, 16, 240, 0f, 0f, 1, new Color(255, 255, 255));
+		return false;
+	}
+
+	public override void NumDust(int i, int j, bool fail, ref int num)
+	{
+		num = (fail ? 1 : 3);
+	}
+
+	public override void MouseOver(int i, int j)
+	{
+		Player localPlayer = Main.LocalPlayer;
+		localPlayer.noThrow = 2;
+		localPlayer.cursorItemIconEnabled = true;
+		localPlayer.cursorItemIconID = ModContent.ItemType<global::CalamityMod.Items.Placeables.FurnitureMarnite.MarniteLight>();
+	}
+
+	public override void ModifyLight(int i, int j, ref float r, ref float g, ref float b)
+	{
+		if (Main.tile[i, j].TileFrameX < 66)
+		{
+			r = 19f / 85f;
+			g = 82f / 85f;
+			b = 1f;
+		}
+	}
+
+	public override void SetDrawPositions(int i, int j, ref int width, ref int offsetY, ref int height, ref short tileFrameX, ref short tileFrameY)
+	{
+		offsetY = 0;
+		if (WorldGen.SolidTile(i, j - 1))
+		{
+			offsetY = 2;
+			if (WorldGen.SolidTile(i - 1, j + 1) || WorldGen.SolidTile(i + 1, j + 1))
+			{
+				offsetY = 4;
+			}
+		}
+	}
+
+	public override void PostDraw(int i, int j, SpriteBatch spriteBatch)
+	{
+		if (FlameTexture == null)
+		{
+			FlameTexture = ModContent.Request<Texture2D>("CalamityMod/Tiles/FurnitureMarnite/MarniteLightFlame", (AssetRequestMode)2);
+		}
+		CalamityUtils.DrawFlameEffect(FlameTexture.Value, i, j, 2);
+	}
+
+	public override void DrawEffects(int i, int j, SpriteBatch spriteBatch, ref TileDrawInfo drawData)
+	{
+		if (Main.tile[i, j].TileFrameX < 66)
+		{
+			CalamityUtils.DrawFlameSparks(187, 5, i, j);
+		}
+	}
+
+	public override bool RightClick(int i, int j)
+	{
+		FurnitureCommon.RightClickBreak(i, j);
+		return true;
+	}
+}

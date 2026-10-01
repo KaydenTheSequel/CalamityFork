@@ -1,0 +1,51 @@
+using CalamityMod.CalPlayer;
+using Terraria;
+using Terraria.ID;
+using Terraria.ModLoader;
+
+namespace CalamityMod.Buffs.StatBuffs;
+
+public class AbyssalDivingSuitBuff : ModBuff
+{
+	public override void SetStaticDefaults()
+	{
+		Main.debuff[base.Type] = true;
+		Main.buffNoSave[base.Type] = true;
+		Main.buffNoTimeDisplay[base.Type] = true;
+		BuffID.Sets.NurseCannotRemoveDebuff[base.Type] = true;
+	}
+
+	public override void Update(Player player, ref int buffIndex)
+	{
+		//IL_0073: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0082: Unknown result type (might be due to invalid IL or missing references)
+		CalamityPlayer modPlayer = player.Calamity();
+		if (modPlayer.abyssalDivingSuitPrevious)
+		{
+			if (player.IsUnderwater())
+			{
+				if (player.maxFallSpeed < 9f)
+				{
+					player.maxFallSpeed = 9f;
+				}
+				player.gills = true;
+			}
+			modPlayer.depthCharm = true;
+			modPlayer.jellyfishNecklace = true;
+			modPlayer.anechoicPlating = true;
+			player.arcticDivingGear = true;
+			player.accFlipper = true;
+			player.accDivingHelm = true;
+			player.iceSkate = true;
+			if (player.wet)
+			{
+				Lighting.AddLight((int)player.Center.X / 16, (int)player.Center.Y / 16, 0.2f, 0.8f, 0.9f);
+			}
+		}
+		else
+		{
+			player.DelBuff(buffIndex);
+			buffIndex--;
+		}
+	}
+}

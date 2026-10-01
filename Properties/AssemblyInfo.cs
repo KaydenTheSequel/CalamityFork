@@ -1,0 +1,19 @@
+using System.Diagnostics;
+using System.Reflection;
+using System.Runtime.CompilerServices;
+using System.Runtime.Versioning;
+using System.Security;
+using System.Security.Permissions;
+
+[assembly: InternalsVisibleTo("CalTestHelpers")]
+[assembly: InternalsVisibleTo("InfernumMode")]
+[assembly: IgnoresAccessChecksTo("FNA")]
+[assembly: IgnoresAccessChecksTo("ReLogic")]
+[assembly: IgnoresAccessChecksTo("tModLoader")]
+[assembly: AssemblyCompany("CalamityMod")]
+[assembly: AssemblyConfiguration("Release")]
+[assembly: AssemblyFileVersion("1.0.0.0")]
+[assembly: AssemblyInformationalVersion("1.0.0+a48369b731581594629304d9d5c652b6933c9c9e")]
+[assembly: AssemblyProduct("CalamityMod")]
+[assembly: AssemblyTitle("CalamityMod")]
+[assembly: AssemblyVersion("1.0.0.0")]

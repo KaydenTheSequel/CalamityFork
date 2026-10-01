@@ -1,0 +1,110 @@
+using System;
+using CalamityMod.Projectiles.Magic;
+using CalamityMod.Rarities;
+using Microsoft.Xna.Framework;
+using Terraria;
+using Terraria.DataStructures;
+using Terraria.ID;
+using Terraria.ModLoader;
+
+namespace CalamityMod.Items.Weapons.Magic;
+
+public class PhoenixFlameBarrage : ModItem, ILocalizedModType, IModType
+{
+	public new string LocalizationCategory => "Items.Weapons.Magic";
+
+	public override void SetStaticDefaults()
+	{
+		Item.staff[base.Type] = true;
+	}
+
+	public override void SetDefaults()
+	{
+		base.Item.width = 106;
+		base.Item.height = 140;
+		base.Item.damage = 140;
+		base.Item.DamageType = DamageClass.Magic;
+		base.Item.mana = 35;
+		base.Item.useTime = 15;
+		base.Item.useAnimation = 30;
+		base.Item.useStyle = 5;
+		base.Item.noMelee = true;
+		base.Item.knockBack = 3.5f;
+		base.Item.value = CalamityGlobalItem.RarityVioletBuyPrice;
+		base.Item.rare = ModContent.RarityType<BurnishedAuric>();
+		base.Item.UseSound = SoundID.Item20;
+		base.Item.autoReuse = true;
+		base.Item.shoot = ModContent.ProjectileType<HolyFlame>();
+		base.Item.shootSpeed = 30f;
+	}
+
+	public override bool Shoot(Player player, EntitySource_ItemUse_WithAmmo source, Vector2 position, Vector2 velocity, int type, int damage, float knockback)
+	{
+		//IL_001f: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0026: Unknown result type (might be due to invalid IL or missing references)
+		//IL_002b: Unknown result type (might be due to invalid IL or missing references)
+		//IL_003d: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0056: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0083: Unknown result type (might be due to invalid IL or missing references)
+		//IL_015b: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0172: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0179: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01c7: Unknown result type (might be due to invalid IL or missing references)
+		//IL_01e0: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0259: Unknown result type (might be due to invalid IL or missing references)
+		//IL_025f: Unknown result type (might be due to invalid IL or missing references)
+		float flameSpeed = base.Item.shootSpeed;
+		player.itemTime = base.Item.useTime;
+		Vector2 realPlayerPos = player.RotatedRelativePoint(player.MountedCenter, reverseRotation: true);
+		float mouseXDist = (float)Main.mouseX + Main.screenPosition.X - realPlayerPos.X;
+		float mouseYDist = (float)Main.mouseY + Main.screenPosition.Y - realPlayerPos.Y;
+		if (player.gravDir == -1f)
+		{
+			mouseYDist = Main.screenPosition.Y + (float)Main.screenHeight - (float)Main.mouseY - realPlayerPos.Y;
+		}
+		float mouseDistance = (float)Math.Sqrt(mouseXDist * mouseXDist + mouseYDist * mouseYDist);
+		if ((float.IsNaN(mouseXDist) && float.IsNaN(mouseYDist)) || (mouseXDist == 0f && mouseYDist == 0f))
+		{
+			mouseXDist = player.direction;
+			mouseYDist = 0f;
+			mouseDistance = flameSpeed;
+		}
+		else
+		{
+			mouseDistance = flameSpeed / mouseDistance;
+		}
+		int flameAmt = 30;
+		if (Main.rand.NextBool(3))
+		{
+			flameAmt++;
+		}
+		if (Main.rand.NextBool(3))
+		{
+			flameAmt++;
+		}
+		for (int i = 0; i < flameAmt; i++)
+		{
+			((Vector2)(ref realPlayerPos))._002Ector(player.position.X + (float)player.width * 0.5f + (float)Main.rand.Next(201) * (0f - (float)player.direction) + ((float)Main.mouseX + Main.screenPosition.X - player.position.X), player.MountedCenter.Y - 600f);
+			realPlayerPos.X = (realPlayerPos.X + player.Center.X) / 2f + (float)Main.rand.Next(-200, 201);
+			realPlayerPos.Y -= 100 * i;
+			mouseXDist = (float)Main.mouseX + Main.screenPosition.X - realPlayerPos.X;
+			mouseYDist = (float)Main.mouseY + Main.screenPosition.Y - realPlayerPos.Y;
+			if (mouseYDist < 0f)
+			{
+				mouseYDist *= -1f;
+			}
+			if (mouseYDist < 20f)
+			{
+				mouseYDist = 20f;
+			}
+			mouseDistance = (float)Math.Sqrt(mouseXDist * mouseXDist + mouseYDist * mouseYDist);
+			mouseDistance = flameSpeed / mouseDistance;
+			mouseXDist *= mouseDistance;
+			mouseYDist *= mouseDistance;
+			float speedX4 = mouseXDist + (float)Main.rand.Next(-30, 31) * 0.02f;
+			float speedY5 = mouseYDist + (float)Main.rand.Next(-30, 31) * 0.02f;
+			Projectile.NewProjectile(source, realPlayerPos.X, realPlayerPos.Y, speedX4, speedY5, type, damage, knockback, player.whoAmI, 0f, Main.rand.Next(15));
+		}
+		return false;
+	}
+}

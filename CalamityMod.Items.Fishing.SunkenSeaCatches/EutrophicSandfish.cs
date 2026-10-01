@@ -1,0 +1,10 @@
+using Terraria.Localization;
+
+namespace CalamityMod.Items.Fishing.SunkenSeaCatches;
+
+public class EutrophicSandfish : BaseQuestFish
+{
+	public override bool QuestCondition => DownedBossSystem.downedDesertScourge;
+
+	public override LocalizedText Location => CalamityUtils.GetText("Items.Fishing.CaughtInSunkenSea");
+}

@@ -1,0 +1,35 @@
+using Terraria.ModLoader;
+
+namespace CalamityMod.Backgrounds;
+
+public class SulphurSeaSurfaceBGStyle : ModSurfaceBackgroundStyle
+{
+	public override int ChooseCloseTexture(ref float scale, ref double parallax, ref float a, ref float b)
+	{
+		b -= 100f;
+		return BackgroundTextureLoader.GetBackgroundSlot("CalamityMod/Backgrounds/BlankPixel");
+	}
+
+	public override void ModifyFarFades(float[] fades, float transitionSpeed)
+	{
+		for (int i = 0; i < fades.Length; i++)
+		{
+			if (i == base.Slot)
+			{
+				fades[i] += transitionSpeed;
+				if (fades[i] > 1f)
+				{
+					fades[i] = 1f;
+				}
+			}
+			else
+			{
+				fades[i] -= transitionSpeed;
+				if (fades[i] < 0f)
+				{
+					fades[i] = 0f;
+				}
+			}
+		}
+	}
+}

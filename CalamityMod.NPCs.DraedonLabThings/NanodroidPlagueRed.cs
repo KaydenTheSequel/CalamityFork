@@ -1,0 +1,134 @@
+using CalamityMod.Items.Critters;
+using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
+using ReLogic.Content;
+using Terraria;
+using Terraria.GameContent;
+using Terraria.ID;
+using Terraria.Localization;
+using Terraria.ModLoader;
+
+namespace CalamityMod.NPCs.DraedonLabThings;
+
+public class NanodroidPlagueRed : ModNPC
+{
+	public static Asset<Texture2D> GlowTexture;
+
+	public override LocalizedText DisplayName => CalamityUtils.GetText("NPCs.Nanodroid.DisplayName");
+
+	public override void SetStaticDefaults()
+	{
+		this.HideFromBestiary();
+		Main.npcFrameCount[base.Type] = 8;
+		NPCID.Sets.CountsAsCritter[base.Type] = true;
+		Main.npcCatchable[base.Type] = true;
+		if (!Main.dedServ)
+		{
+			GlowTexture = ModContent.Request<Texture2D>(Texture + "_Glow", (AssetRequestMode)2);
+		}
+	}
+
+	public override void SetDefaults()
+	{
+		base.NPC.CloneDefaults(358);
+		base.NPC.width = 16;
+		base.NPC.height = 12;
+		base.NPC.HitSound = SoundID.NPCHit4;
+		base.NPC.DeathSound = SoundID.NPCDeath44;
+		base.NPC.catchItem = (short)ModContent.ItemType<NanodroidPlagueRedItem>();
+	}
+
+	public override void AI()
+	{
+		//IL_001a: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0051: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0056: Unknown result type (might be due to invalid IL or missing references)
+		//IL_005a: Unknown result type (might be due to invalid IL or missing references)
+		if (base.NPC.localAI[2] > 3f)
+		{
+			Lighting.AddLight(base.NPC.Center, 0.3f, 0.03f, 0f);
+		}
+		ActiveEntityIterator<Player>.Enumerator enumerator = Main.ActivePlayers.GetEnumerator();
+		while (enumerator.MoveNext())
+		{
+			Player player = enumerator.Current;
+			Rectangle hitbox = base.NPC.Hitbox;
+			if (((Rectangle)(ref hitbox)).Intersects(player.HitboxForBestiaryNearbyCheck))
+			{
+				NPC nPC = new NPC();
+				nPC.SetDefaults(ModContent.NPCType<Nanodroid>());
+				Main.BestiaryTracker.Sights.RegisterWasNearby(nPC);
+				break;
+			}
+		}
+		if (base.NPC.shimmerTransparency > 0f)
+		{
+			base.NPC.shimmerTransparency -= 0.05f;
+		}
+	}
+
+	public override bool? CanBeHitByItem(Player player, Item item)
+	{
+		return null;
+	}
+
+	public override bool? CanBeHitByProjectile(Projectile projectile)
+	{
+		return null;
+	}
+
+	public override void FindFrame(int frameHeight)
+	{
+		base.NPC.spriteDirection = base.NPC.direction;
+		base.NPC.frameCounter += 0.30000001192092896;
+		base.NPC.frameCounter %= Main.npcFrameCount[base.Type];
+		int frame = (int)base.NPC.frameCounter;
+		base.NPC.frame.Y = frame * frameHeight;
+	}
+
+	public override void HitEffect(NPC.HitInfo hit)
+	{
+		//IL_000a: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0037: Unknown result type (might be due to invalid IL or missing references)
+		//IL_003d: Unknown result type (might be due to invalid IL or missing references)
+		for (int i = 0; i < 6; i++)
+		{
+			Dust.NewDustDirect(base.NPC.position, base.NPC.width, base.NPC.height, 226);
+		}
+	}
+
+	public override bool PreDraw(SpriteBatch spriteBatch, Vector2 screenPos, Color drawColor)
+	{
+		//IL_0023: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0028: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0029: Unknown result type (might be due to invalid IL or missing references)
+		//IL_002e: Unknown result type (might be due to invalid IL or missing references)
+		//IL_003e: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0043: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0048: Unknown result type (might be due to invalid IL or missing references)
+		//IL_005b: Unknown result type (might be due to invalid IL or missing references)
+		//IL_005e: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0065: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0075: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0076: Unknown result type (might be due to invalid IL or missing references)
+		//IL_008c: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0091: Unknown result type (might be due to invalid IL or missing references)
+		//IL_009b: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00ab: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00b8: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00bf: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00cf: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00d4: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00ea: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00ef: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00f9: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0109: Unknown result type (might be due to invalid IL or missing references)
+		Texture2D critterTexture = TextureAssets.Npc[base.Type].Value;
+		Texture2D glowmask = GlowTexture.Value;
+		Vector2 drawPosition = base.NPC.Center - screenPos + Vector2.UnitY * base.NPC.gfxOffY;
+		SpriteEffects direction = (SpriteEffects)(base.NPC.spriteDirection == 1);
+		spriteBatch.Draw(critterTexture, drawPosition, (Rectangle?)base.NPC.frame, base.NPC.GetAlpha(drawColor), base.NPC.rotation, base.NPC.frame.Size() * 0.5f, base.NPC.scale, direction, 0f);
+		spriteBatch.Draw(glowmask, drawPosition, (Rectangle?)base.NPC.frame, base.NPC.GetAlpha(Color.White), base.NPC.rotation, base.NPC.frame.Size() * 0.5f, base.NPC.scale, direction, 0f);
+		return false;
+	}
+}

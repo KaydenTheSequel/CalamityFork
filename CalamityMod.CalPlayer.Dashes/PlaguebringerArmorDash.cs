@@ -1,0 +1,87 @@
+using System;
+using CalamityMod.Enums;
+using CalamityMod.Items.Armor.Plaguebringer;
+using Microsoft.Xna.Framework;
+using Terraria;
+using Terraria.DataStructures;
+using Terraria.Graphics.Shaders;
+using Terraria.ModLoader;
+
+namespace CalamityMod.CalPlayer.Dashes;
+
+public class PlaguebringerArmorDash : PlayerDashEffect
+{
+	public new static string ID { get; private set; }
+
+	public override DashCollisionType CollisionType => DashCollisionType.NoCollision;
+
+	public override bool IsOmnidirectional => false;
+
+	public override void Load()
+	{
+		ID = DashID;
+	}
+
+	public override float CalculateDashSpeed(Player player)
+	{
+		return 19f;
+	}
+
+	public override void OnDashEffects(Player player)
+	{
+		//IL_0008: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0029: Unknown result type (might be due to invalid IL or missing references)
+		//IL_002f: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0082: Unknown result type (might be due to invalid IL or missing references)
+		//IL_008c: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0091: Unknown result type (might be due to invalid IL or missing references)
+		for (int d = 0; d < 60; d++)
+		{
+			Dust dust = Dust.NewDustDirect(player.position, player.width, player.height, 89, 0f, 0f, 100, default(Color), 1.25f);
+			dust.position.X += Main.rand.NextFloat(-5f, 5f);
+			dust.position.Y += Main.rand.NextFloat(-5f, 5f);
+			dust.velocity *= 0.2f;
+			dust.scale *= Main.rand.NextFloat(1f, 1.2f);
+			dust.shader = GameShaders.Armor.GetSecondaryShader(player.ArmorSetDye(), player);
+			dust.noGravity = true;
+			dust.fadeIn = 0.5f;
+		}
+	}
+
+	public override void MidDashEffects(Player player, ref float dashSpeed, ref float dashSpeedDecelerationFactor, ref float runSpeedDecelerationFactor)
+	{
+		//IL_0023: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0046: Unknown result type (might be due to invalid IL or missing references)
+		//IL_004c: Unknown result type (might be due to invalid IL or missing references)
+		//IL_005a: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0064: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0069: Unknown result type (might be due to invalid IL or missing references)
+		for (int m = 0; m < 24; m++)
+		{
+			Dust plagueDashDust = Dust.NewDustDirect(new Vector2(player.position.X, player.position.Y + 4f), player.width, player.height - 8, 89, 0f, 0f, 100);
+			plagueDashDust.velocity *= 0.1f;
+			plagueDashDust.scale *= Main.rand.NextFloat(1f, 1.2f);
+			plagueDashDust.shader = GameShaders.Armor.GetSecondaryShader(player.ArmorSetDye(), player);
+			plagueDashDust.noGravity = true;
+			if (Main.rand.NextBool())
+			{
+				plagueDashDust.fadeIn = 0.5f;
+			}
+		}
+		dashSpeed = 12.5f;
+	}
+
+	public override void OnHitEffects(Player player, NPC npc, IEntitySource source, ref DashHitContext hitContext)
+	{
+		int hitDirection = player.direction;
+		if (player.velocity.X != 0f)
+		{
+			hitDirection = Math.Sign(player.velocity.X);
+		}
+		hitContext.HitDirection = hitDirection;
+		hitContext.PlayerImmunityFrames = PlaguebringerVisor.PlagueDashIFrames;
+		hitContext.damageClass = DamageClass.Summon;
+		hitContext.BaseDamage = PlaguebringerVisor.PlagueDashDamage;
+		hitContext.BaseKnockback = PlaguebringerVisor.PlagueDashKnockback;
+	}
+}
