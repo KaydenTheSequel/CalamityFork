@@ -1,0 +1,7 @@
+displayName = Calamity Mod
+author = The Calamity Dev Team
+version = 2.1.2
+homepage = https://calamitymod.com
+modReferences = CalamityModMusic
+hideResources = true
+sortAfter = CalamityModMusic

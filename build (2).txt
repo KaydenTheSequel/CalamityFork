@@ -1,0 +1,6 @@
+displayName = Calamity Mod Music
+author = The Calamity Dev Team
+version = 2.1
+homepage = https://calamitymod.com
+hideCode = true
+hideResources = true
